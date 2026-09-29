@@ -1,0 +1,41 @@
+services:
+  keycloak:
+    image: keycloak/keycloak:latest
+    container_name: keycloak
+    restart: unless-stopped
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HOSTNAME=http://localhost:8080
+      - KC_HOSTNAME_BACKCHANNEL_DYNAMIC=true
+      - KC_HTTP_ENABLED=true
+    ports:
+      - "8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    command: start-dev --import-realm --features=token-exchange,admin-fine-grained-authz
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: auth-service
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=:3000
+      - ENV=development
+      - KEYCLOAK_BASE_URL=http://keycloak:8080
+      - KEYCLOAK_PUBLIC_URL=http://localhost:8080
+      - KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/auth
+      - KEYCLOAK_REALM=auth
+      - KEYCLOAK_CLIENT_ID=auth-backend
+      - KEYCLOAK_CLIENT_SECRET=Dr4G0j6vvfWMdvrKdHAYBrDNdmopUgkEF0YRZuWrWRZOv7RWnJqJ26MseNiPrXjDQDo0ZCiOGbdcHvu2cWNuk8
+      - ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173,http://localhost:8080
+    depends_on:
+      - keycloak
+
+volumes:
+  keycloak_data:
