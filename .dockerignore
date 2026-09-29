@@ -1,7 +1,31 @@
-tmp
+# Git & Version Control
 .git
 .gitignore
-.air.toml
+
+# Environment & Secrets (Never bake into Docker image)
+.env
+.env.*
+
+# Build Artifacts & Temporary Files
+tmp/
+bin/
+auth-server
 *.log
+
+# Dev Tools & Configurations
+.air.toml
 docker-compose.yml
+Dockerfile
+
+# Documentation, Postman, & Benchmarks
 README.md
+auth.json
+benchmark/
+realm-export.json
+data/
+
+# IDE & OS Files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db

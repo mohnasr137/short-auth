@@ -1,2 +1,39 @@
-tmp/
+# Environment & Secrets
 .env
+.env.*
+!.env.example
+
+# Binaries and Build Artifacts
+tmp/
+bin/
+auth-server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Database & Persistent Data Directories
+data/
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs & Temporary Files
+*.log
+
+# Benchmark Result Exports
+benchmark/results_summary.json
+
+# IDE & Editor Files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Operating System Files
+.DS_Store
+Thumbs.db

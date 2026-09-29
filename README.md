@@ -2,14 +2,15 @@
 
 A production-ready, lightweight, and plug-and-play **Authentication & Authorization** microservice built with **Go (Gin)** and backed by an isolated **Keycloak** Identity Provider.
 
-Designed for microservices architectures that need a **fast, trusted, and self-contained** auth gateway capable of handling **10,000+ RPS** for downstream token verification with zero database dependencies.
+Designed for microservices architectures that need a **fast, trusted, and self-contained** auth gateway capable of handling **10,000+ RPS** for downstream token verification with zero external dependencies.
 
 ---
 
 ## ✨ Features
 
 - **⚡ Blazing Fast**: JWT signature verification runs locally in CPU memory via OIDC JWKS (`< 0.5ms` latency, easily exceeds 10,000 RPS).
-- **🔒 Zero Database Maintenance**: Keycloak runs in an isolated, persistent Docker container with embedded storage. No PostgreSQL, MySQL, or migrations required.
+- **🗄️ Your Database, Zero Lock-In**: Connects directly to your existing database (PostgreSQL, MySQL, Supabase, Neon, AWS RDS). All tables live cleanly inside an isolated `keycloak` schema.
+- **🛡️ Bulletproof Persistence**: Zero Docker storage volumes (`docker compose down -v` will **never** wipe your users or passwords).
 - **🛡️ 64-Shard Striped Rate Limiting**: In-memory token-bucket rate limiter striped across 64 independent mutex shards to eliminate lock contention under extreme concurrency.
 - **🍪 OWASP-Compliant Cookies**: Automatic `HttpOnly`, `SameSite=Lax`, and `Secure` cookie management for SPAs, mobile apps, and browser clients.
 - **🌐 Turnkey Social Login**: Pre-configured Google OAuth2 federation with anti-CSRF state cookies and open-redirect protection.
@@ -37,23 +38,51 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
                  ┌───────────────────────┐       ┌───────────────────────┐
                  │  In-Memory CPU Cache  │       │       Keycloak        │
                  │  (JWKS Public Keys)   │       │     (Port :8080)      │
-                 └───────────────────────┘       └───────────────────────┘
+                 └───────────────────────┘       └───────────┬───────────┘
+                                                             │
+                                                             ▼ (JDBC)
+                                                 ┌───────────────────────┐
+                                                 │   Your Database       │
+                                                 │ (Postgres/MySQL/Cloud)│
+                                                 └───────────────────────┘
 ```
 
 ---
 
-## 🚀 Quick Start (One Command, Zero Installs)
+## 🚀 Quick Start (3 Simple Steps)
 
-### Single-Command Launch (Production & Dev Ready)
-Launch both Keycloak and the Go Auth microservice simultaneously with automatic realm provisioning:
+### Step 1: Copy Environment Template
+```bash
+cp .env.example .env
+```
 
+### Step 2: Configure Your Database Connection
+Open `.env` and fill in your existing database details:
+
+```env
+# Database vendor: postgres (recommended) or mysql
+DB_VENDOR=postgres
+
+# Database URL:
+# For local DB running on your machine:
+DB_URL=jdbc:postgresql://host.docker.internal:5432/my_database
+# For cloud DB (Supabase / AWS RDS / Neon):
+# DB_URL=jdbc:postgresql://db.xxxx.supabase.co:5432/postgres?sslmode=require
+
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+DB_SCHEMA=keycloak
+```
+
+> [!TIP]
+> **Database Isolation**: The `DB_SCHEMA=keycloak` setting ensures all authentication tables are isolated in their own schema, so they never mix with your application tables.
+
+### Step 3: Launch Containers
 ```bash
 docker compose up -d --build
 ```
 
-That's it! 
-- **Keycloak** will start on port `8080` and auto-import the hardened `auth` realm.
-- **Go Auth API** will start on port `3000`, automatically wait for Keycloak to finish bootstrapping, and become healthy.
+Keycloak will connect to your database, automatically create its tables in the `keycloak` schema, import the `auth` realm, and start serving alongside the Go Auth microservice!
 
 Check status:
 ```bash
@@ -63,24 +92,9 @@ curl http://localhost:3000/health
 
 ---
 
-### Local Development (Optional)
-If you prefer running the Go binary locally on your host with hot reloading (`air` or `go run`):
-
-```bash
-# 1. Start Keycloak only
-docker compose up -d keycloak
-
-# 2. Run the Go Auth service locally
-go run main.go
-# or with live reload:
-air
-```
-
----
-
 ## 📡 API Reference
 
-All endpoints are prefixed with `/api/auth`.
+All endpoints are prefixed with `/api/auth`. You can also import [`auth.json`](./auth.json) directly into **Postman** (v2.1.0 collection with automated token extractors).
 
 | Method | Endpoint | Description | Rate Limit |
 | :--- | :--- | :--- | :--- |
@@ -120,8 +134,6 @@ curl -X POST http://localhost:3000/api/auth/register \
 }
 ```
 
----
-
 #### 2. User Login (`POST /api/auth/login`)
 ```bash
 curl -X POST http://localhost:3000/api/auth/login \
@@ -132,23 +144,21 @@ curl -X POST http://localhost:3000/api/auth/login \
   }'
 ```
 **Response (`200 OK`):**
-*(Also automatically sets `access_token` and `refresh_token` as HttpOnly cookies)*
 ```json
 {
   "access_token": "eyJhbGciOiJSUzI1NiIs...",
   "refresh_token": "eyJhbGciOiJIUzI1NiIs...",
-  "expires_in": 300
+  "expires_in": 300,
+  "refresh_expires_in": 1800,
+  "token_type": "Bearer"
 }
 ```
 
----
-
-#### 3. Token Verification for Downstream Microservices (`GET /api/auth/verify`)
-Downstream microservices (Orders, Billing, Products) can authenticate callers by forwarding the `Bearer <token>`:
-
+#### 3. Token Verification for Microservices (`GET /api/auth/verify`)
+Downstream microservices can verify tokens at 10,000+ RPS:
 ```bash
 curl -X GET http://localhost:3000/api/auth/verify \
-  -H "Authorization: Bearer <access_token>"
+  -H "Authorization: Bearer eyJhbGciOiJSUzI1NiIs..."
 ```
 **Response (`200 OK`):**
 ```json
@@ -156,32 +166,25 @@ curl -X GET http://localhost:3000/api/auth/verify \
   "valid": true,
   "user_id": "c1f7a0b2-...",
   "username": "john_doe",
-  "email": "john@example.com",
-  "name": "John Doe",
-  "first_name": "John",
-  "last_name": "Doe",
-  "roles": ["user", "default-roles-auth"]
+  "roles": ["user"]
 }
 ```
 
 ---
 
-## ⚙️ Environment Configuration (`.env`)
+## ⚙️ Environment Configuration Reference
 
-```ini
-# HTTP Server Port
-PORT=:3000
-
-# Keycloak OIDC Provider Settings
-KEYCLOAK_ISSUER_URL=http://localhost:8080/realms/auth
-KEYCLOAK_BASE_URL=http://localhost:8080
-KEYCLOAK_REALM=auth
-KEYCLOAK_CLIENT_ID=auth-backend
-KEYCLOAK_CLIENT_SECRET=Dr4G0j6vvfWMdvrKdHAYBrDNdmopUgkEF0YRZuWrWRZOv7RWnJqJ26MseNiPrXjDQDo0ZCiOGbdcHvu2cWNuk8
-
-# Allowed CORS Origins (comma-separated)
-ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173,http://localhost:8080
-```
+| Variable | Description | Default / Example |
+| :--- | :--- | :--- |
+| `DB_VENDOR` | Database engine (`postgres`, `mysql`) | `postgres` |
+| `DB_URL` | JDBC database connection string | `jdbc:postgresql://host.docker.internal:5432/mydb` |
+| `DB_USERNAME` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `secret` |
+| `DB_SCHEMA` | Isolated database schema for auth tables | `keycloak` |
+| `PORT` | Go microservice listen port | `:3000` |
+| `KEYCLOAK_BASE_URL` | Internal Docker URL to reach Keycloak | `http://keycloak:8080` |
+| `KEYCLOAK_PUBLIC_URL` | Public-facing Keycloak URL for browser redirects | `http://localhost:8080` |
+| `ALLOWED_ORIGINS` | Comma-separated allowed CORS origins | `http://localhost:3000,http://localhost:5173` |
 
 ---
 
@@ -190,13 +193,16 @@ ALLOWED_ORIGINS=http://localhost,http://localhost:3000,http://localhost:5173,htt
 ```
 .
 ├── Dockerfile                # Multi-stage minimal production Docker image
-├── .dockerignore             # Excludes transient files from container build context
-├── docker-compose.yml        # Orchestrates Keycloak + Go Auth Service stack
+├── .dockerignore             # Excludes build context & secrets
+├── .gitignore                # Excludes secrets, binaries, logs, and data
+├── .env.example              # Documented environment template with DB presets
+├── docker-compose.yml        # Keycloak + Go Auth Service stack with external DB wiring
 ├── realm-export.json         # Hardened Keycloak realm with auto-provisioned client
 ├── auth.json                 # Postman API Collection (v2.1.0) with automated token tests
 ├── benchmark
 │   ├── k6_benchmark.js       # Declarative k6 10,000 RPS benchmark scenario
-│   ├── run.sh                # Automated benchmark execution script
+│   ├── run.sh                # Automated k6 runner script
+│   ├── run_hey.sh            # Automated hey runner script
 │   ├── RESULTS.md            # Verified benchmark metrics and telemetry
 │   └── TUNING.md             # Production Linux OS kernel socket & cloud tuning guide
 ├── config
