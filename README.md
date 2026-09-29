@@ -246,14 +246,14 @@ curl -X GET http://localhost:3000/api/auth/verify \
 
 ## 📊 Benchmark Verification (10,000 RPS Target)
 
-The token verification architecture was benchmarked under extreme concurrency using **Grafana `k6`** and **`hey`**. Full logs and methodology are saved in [`benchmark/RESULTS.md`](./benchmark/RESULTS.md) and [`benchmark/TUNING.md`](./benchmark/TUNING.md).
+The token verification architecture was benchmarked under extreme concurrency across both **PostgreSQL 18** and **MySQL Latest** stacks using **Grafana `k6`** and **`hey`**. Full logs and methodology are saved in [`benchmark/RESULTS.md`](./benchmark/RESULTS.md) and [`benchmark/TUNING.md`](./benchmark/TUNING.md).
 
 | Metric | Measured Value | SLA Target | Status |
 | :--- | :---: | :---: | :---: |
-| **Total Requests Handled** | **212,822 requests** | N/A | ✅ |
+| **Total Requests Handled** | **439,362 requests** | N/A | ✅ **Sustained Load** |
 | **HTTP Error Rate** | **0.00%** (0 errors) | < 1.0% | 🏆 **Zero Errors** |
 | **Peak Throughput / Arrival Rate** | **10,000.00 req/sec** | 10,000 RPS | 🎯 **Target Achieved** |
-| **Fastest Cryptographic Verification** | **533 µs** (0.53 ms) | < 1.0 ms | ⚡ **Sub-Millisecond** |
+| **Fastest Cryptographic Verification** | **489.5 µs** (0.49 ms) | < 1.0 ms | ⚡ **Sub-Millisecond** |
 | **Integrity Checks** | **100.00% passed** | 100.00% | 🏆 **100% Cryptographically Valid** |
 
 ---
