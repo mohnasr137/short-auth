@@ -1,0 +1,70 @@
+services:
+  # 1. PostgreSQL Database
+  db:
+    image: postgres:18
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: "123456"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    configs:
+      - source: init-schema
+        target: /docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # 2. All-in-One Auth Service (Keycloak + Go Gateway)
+  auth-service:
+    image: auth-service:latest
+    container_name: auth_service
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/3000"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
+    ports:
+      - "3000:3000"
+      - "8080:8080"
+    environment:
+      DB_VENDOR: postgres
+      DB_URL: jdbc:postgresql://db:5432/keycloak
+      DB_USERNAME: keycloak
+      DB_PASSWORD: "123456"
+      DB_SCHEMA: keycloak
+      PORT: ":3000"
+      ENV: production
+      GIN_MODE: release
+      ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:5173"
+      KEYCLOAK_MAX_ATTEMPTS: "300"
+
+  # 3. Web-based Database Management UI
+  adminer:
+    image: adminer:latest
+    container_name: adminer_ui
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+configs:
+  init-schema:
+    content: "CREATE SCHEMA IF NOT EXISTS keycloak;"
+
+volumes:
+  postgres_data:

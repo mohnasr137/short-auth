@@ -98,14 +98,18 @@ KC_PID=$!
 # ==============================================================================
 # 6. Wait for Keycloak to Finish Starting Before Launching Backend
 # ==============================================================================
-echo "⏳ [All-in-One] Waiting for Keycloak to finish initializing on port 8080..."
-MAX_ATTEMPTS=90
+MAX_ATTEMPTS=${KEYCLOAK_MAX_ATTEMPTS:-300}
+echo "⏳ [All-in-One] Waiting for Keycloak to initialize on port 8080 (timeout: ${MAX_ATTEMPTS}s)..."
+echo "ℹ️  [All-in-One] Note: On a new database, Keycloak performs initial table creation and migrations (~20-40s)."
 ATTEMPT=1
 until (echo > /dev/tcp/127.0.0.1/8080) 2>/dev/null; do
   if [ "$ATTEMPT" -ge "$MAX_ATTEMPTS" ]; then
     echo "❌ ERROR: Timed out waiting for Keycloak to start after ${MAX_ATTEMPTS} seconds."
     kill -TERM "$KC_PID" 2>/dev/null || true
     exit 1
+  fi
+  if [ $((ATTEMPT % 10)) -eq 0 ]; then
+    echo "⏳ [All-in-One] Still applying database migrations & initializing Keycloak... (${ATTEMPT}s / ${MAX_ATTEMPTS}s elapsed)"
   fi
   sleep 1
   ATTEMPT=$((ATTEMPT + 1))
@@ -119,6 +123,7 @@ echo "✅ Keycloak is online and ready!"
 # 7. Launch Go Auth Microservice Gateway
 # ==============================================================================
 echo "🚀 [All-in-One] Starting Go Auth Microservice Gateway on port $PORT..."
+echo "🎉 Auth API Gateway live at http://localhost:${PORT#:}"
 /app/auth-server &
 GO_PID=$!
 

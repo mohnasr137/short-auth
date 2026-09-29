@@ -17,6 +17,8 @@ auth-server
 
 # Database & Persistent Data Directories
 data/
+mysql_data/
+postgres_data/
 *.db
 *.sqlite
 *.sqlite3

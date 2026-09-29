@@ -17,10 +17,11 @@ auth-server
 docker-compose.yml
 Dockerfile
 
-# Documentation, Postman, & Benchmarks
+# Documentation, Postman, Benchmarks, & Integrations
 README.md
 auth.json
 benchmark/
+integrations/
 data/
 
 # IDE & OS Files

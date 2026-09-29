@@ -79,7 +79,7 @@ ulimit -n 65535
                                      ▼
                           ┌─────────────────────┐
                           │    Keycloak IAM     │
-                          │   (Embedded DB)     │
+                          │   (External DB)     │
                           └─────────────────────┘
 ```
 
