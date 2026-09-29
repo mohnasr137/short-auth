@@ -12,7 +12,7 @@ import (
 	"sync"
 	"time"
 
-	"auth/internal"
+	"mohnasr137/short-auth/internal"
 )
 
 type RegisterInput struct {

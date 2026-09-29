@@ -1,4 +1,4 @@
-module auth
+module mohnasr137/short-auth
 
 go 1.26.5
 

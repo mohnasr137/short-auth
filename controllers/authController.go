@@ -13,9 +13,9 @@ import (
 	"slices"
 	"strings"
 
-	"auth/internal"
-	"auth/middlewares"
-	"auth/services"
+	"mohnasr137/short-auth/internal"
+	"mohnasr137/short-auth/middlewares"
+	"mohnasr137/short-auth/services"
 
 	"github.com/gin-gonic/gin"
 )

@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"auth/config"
+	"mohnasr137/short-auth/config"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 )

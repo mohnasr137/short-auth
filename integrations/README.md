@@ -1,6 +1,6 @@
 # 🔌 Auth Service Database Integration Examples
 
-This folder provides standalone **Docker Compose** templates demonstrating how to deploy the pre-built `auth-service:latest` image alongside popular relational databases (**PostgreSQL 18** and **MySQL Latest**), complete with an **Adminer** web database management interface.
+This folder provides standalone **Docker Compose** templates demonstrating how to deploy the pre-built `short-auth:latest` image alongside popular relational databases (**PostgreSQL 18** and **MySQL Latest**), complete with an **Adminer** web database management interface.
 
 These compose files are designed as turnkey reference architectures for developers integrating the Auth Microservice with their own infrastructure.
 

@@ -28,7 +28,7 @@ services:
 
   # 2. All-in-One Auth Service (Keycloak + Go Gateway)
   auth-service:
-    image: auth-service:latest
+    image: short-auth:latest
     container_name: auth_service
     restart: always
     depends_on:

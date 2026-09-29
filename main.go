@@ -11,10 +11,10 @@ import (
 	"syscall"
 	"time"
 
-	"auth/config"
-	"auth/internal"
-	"auth/middlewares"
-	"auth/routes"
+	"mohnasr137/short-auth/config"
+	"mohnasr137/short-auth/internal"
+	"mohnasr137/short-auth/middlewares"
+	"mohnasr137/short-auth/routes"
 
 	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/gin-gonic/gin"

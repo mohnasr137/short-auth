@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"auth/internal"
+	"mohnasr137/short-auth/internal"
 
 	"github.com/gin-gonic/gin"
 )

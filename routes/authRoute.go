@@ -1,9 +1,9 @@
 package routes
 
 import (
-	"auth/controllers"
-	"auth/internal"
-	"auth/middlewares"
+	"mohnasr137/short-auth/controllers"
+	"mohnasr137/short-auth/internal"
+	"mohnasr137/short-auth/middlewares"
 
 	"github.com/gin-gonic/gin"
 )

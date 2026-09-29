@@ -140,7 +140,7 @@ curl http://localhost:3000/health
 
 ## 🔌 Integration Examples ([`integrations/`](./integrations))
 
-Ready-to-use Docker Compose integration examples are provided in the [`integrations/`](./integrations) folder (see [integrations documentation](./integrations/README.md)). These show external developers how to run the published `auth-service:latest` image directly alongside a database and the **Adminer** web database manager (`http://localhost:8081`):
+Ready-to-use Docker Compose integration examples are provided in the [`integrations/`](./integrations) folder (see [integrations documentation](./integrations/README.md)). These show external developers how to run the published `short-auth:latest` image directly alongside a database and the **Adminer** web database manager (`http://localhost:8081`):
 
 ### 🐘 PostgreSQL 18 Integration
 Runs an isolated PostgreSQL 18 stack with automatic `keycloak` schema setup:
