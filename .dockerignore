@@ -21,7 +21,6 @@ Dockerfile
 README.md
 auth.json
 benchmark/
-realm-export.json
 data/
 
 # IDE & OS Files

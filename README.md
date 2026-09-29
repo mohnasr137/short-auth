@@ -49,9 +49,19 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
 
 ---
 
-## 🚀 Quick Start (3 Simple Steps)
+## 🚀 Quick Start
 
-### Step 1: Copy Environment Template
+### ⚡ Option 1: 1-Click Smart Launcher (Easiest)
+Simply run the setup script:
+```bash
+./start.sh
+```
+* **If `.env` or `docker-compose.yml` is already configured**: It starts the service immediately with **zero questions**.
+* **If it's a fresh clone**: It opens a guided wizard asking whether you want an automatic local PostgreSQL container or to connect to your existing database.
+
+---
+
+### 🛠️ Option 2: Manual Setup (3 Steps)
 ```bash
 cp .env.example .env
 ```
@@ -74,15 +84,25 @@ DB_PASSWORD=your_password
 DB_SCHEMA=keycloak
 ```
 
-> [!TIP]
-> **Database Isolation**: The `DB_SCHEMA=keycloak` setting ensures all authentication tables are isolated in their own schema, so they never mix with your application tables.
+### Step 3: Launch with One Command
 
-### Step 3: Launch Containers
+#### Option A: Docker Run (Single Container)
 ```bash
-docker compose up -d --build
+docker run -d \
+  --name auth-service \
+  -p 3000:3000 \
+  -p 8080:8080 \
+  --env-file .env \
+  --add-host host.docker.internal:host-gateway \
+  auth-service:latest
 ```
 
-Keycloak will connect to your database, automatically create its tables in the `keycloak` schema, import the `auth` realm, and start serving alongside the Go Auth microservice!
+#### Option B: Docker Compose
+```bash
+docker compose up -d
+```
+
+The container starts Keycloak, creates tables in your database schema, auto-imports the `auth` realm, and boots the Go Auth microservice gateway!
 
 Check status:
 ```bash
