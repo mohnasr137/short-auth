@@ -80,7 +80,7 @@ docker compose -f integrations/docker-compose.mysql.yml down -v
 
 Both integration templates use native dependency ordering:
 1. **Database Container (`db`)**: Boots first. It defines a native healthcheck (`pg_isready` for PostgreSQL, `mysqladmin ping` for MySQL).
-2. **Auth Service Container (`auth-service`)**: Waits for `db` to reach `healthy` state before starting.
+2. **Auth Service Container (`short-auth`)**: Waits for `db` to reach `healthy` state before starting.
    - Keycloak initializes, runs schema migrations, and registers the pre-configured `auth` realm.
    - The embedded entrypoint supervisor displays a progress heartbeat every 10 seconds during migrations.
    - Once Keycloak port `8080` responds, the Go API Gateway launches on port `3000`.

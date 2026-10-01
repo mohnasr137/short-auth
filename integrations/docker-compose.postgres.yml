@@ -23,9 +23,9 @@ services:
       start_period: 10s
 
   # 2. All-in-One Auth Service (Keycloak + Go Gateway)
-  auth-service:
+  short-auth:
     image: short-auth:latest
-    container_name: auth_service
+    container_name: short_auth
     restart: always
     depends_on:
       db:

@@ -1,10 +1,10 @@
 services:
-  auth-service:
-    image: auth-service:latest
+  short-auth:
+    image: short-auth:latest
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: auth-service
+    container_name: short-auth
     restart: unless-stopped
     ports:
       - "3000:3000"  # Go Auth Microservice API Gateway

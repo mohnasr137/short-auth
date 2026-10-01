@@ -91,7 +91,7 @@ func main() {
 	healthHandler := func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"status":      "ok",
-			"service":     "auth",
+			"service":     "short-auth",
 			"environment": cfg.Environment,
 		})
 	}

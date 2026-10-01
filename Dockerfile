@@ -17,7 +17,7 @@ RUN go mod download
 COPY . .
 
 # Compile static, stripped binary (CGO disabled for zero external libc dependencies)
-RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/auth-server main.go
+RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-s -w" -o /app/short-auth main.go
 
 # ==============================================================================
 # Stage 2: All-in-One Container (Keycloak Identity Provider + Go Auth Gateway)
@@ -28,14 +28,14 @@ USER root
 WORKDIR /app
 
 # Copy compiled static Go binary from builder stage
-COPY --from=builder /app/auth-server /app/auth-server
+COPY --from=builder /app/short-auth /app/short-auth
 
 # Copy realm export file for automatic realm initialization
 COPY realm-export.json /opt/keycloak/data/import/realm-export.json
 
 # Copy and configure startup entrypoint script
 COPY entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/auth-server /app/entrypoint.sh && \
+RUN chmod +x /app/short-auth /app/entrypoint.sh && \
     chown -R 1000:0 /app /opt/keycloak/data/import
 
 # Set production environment defaults (ensures Gin runs in ReleaseMode)

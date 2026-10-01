@@ -124,7 +124,7 @@ echo "✅ Keycloak is online and ready!"
 # ==============================================================================
 echo "🚀 [All-in-One] Starting Go Auth Microservice Gateway on port $PORT..."
 echo "🎉 Auth API Gateway live at http://localhost:${PORT#:}"
-/app/auth-server &
+/app/short-auth &
 GO_PID=$!
 
 # Wait for either process to terminate

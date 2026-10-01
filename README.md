@@ -1,4 +1,4 @@
-# 🚀 High-Performance Go + Keycloak Auth Microservice
+# 🚀 short-auth: High-Performance Go + Keycloak Auth Microservice
 
 A production-ready, lightweight, and plug-and-play **Authentication & Authorization** microservice built with **Go (Gin)** and backed by an embedded **Keycloak** Identity Provider packaged inside a single unified container.
 
@@ -9,7 +9,7 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
 ## ✨ Features
 
 - **⚡ Blazing Fast**: JWT signature verification runs locally in CPU memory via OIDC JWKS (`< 0.5ms` latency, verified at **10,000+ RPS** with **0.00% errors**).
-- **📦 All-in-One Container**: Keycloak and the Go Auth Microservice are bundled into a single image (`auth-service:latest`).
+- **📦 All-in-One Container**: Keycloak and the Go Auth Microservice are bundled into a single image (`short-auth:latest`).
 - **🗄️ Your Database, Zero Lock-In**: Connects directly to your existing database (PostgreSQL, MySQL, Supabase, Neon, AWS RDS). All tables live cleanly inside an isolated `keycloak` schema.
 - **🛡️ Bulletproof Persistence**: Zero Docker storage volumes (`docker compose down -v` will **never** wipe your users or passwords).
 - **🛡️ 64-Shard Striped Rate Limiting**: In-memory token-bucket rate limiter striped across 64 independent mutex shards to eliminate lock contention under extreme concurrency.
@@ -24,7 +24,7 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                   auth-service:latest (Single Container)               │
+│                   short-auth:latest (Single Container)                 │
 │                                                                        │
 │   Client Traffic                                                       │
 │         │                                                              │
@@ -90,14 +90,14 @@ Simply run the setup script:
 
 ```bash
 docker run -d \
-  --name auth-service \
+  --name short-auth \
   -p 3000:3000 \
   -p 8080:8080 \
   -e DB_URL=jdbc:postgresql://host.docker.internal:5432/my_database \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=your_secure_password \
   --add-host host.docker.internal:host-gateway \
-  auth-service:latest
+  short-auth:latest
 ```
 
 ---
@@ -105,7 +105,7 @@ docker run -d \
 ### 🖥️ Option 4: Docker Desktop GUI
 
 If you are running the image via the **Docker Desktop application**:
-1. Go to **Images** ➔ Find **`auth-service:latest`** ➔ Click **Run**.
+1. Go to **Images** ➔ Find **`short-auth:latest`** ➔ Click **Run**.
 2. Expand **Optional settings**:
    * **Ports**:
      * Map `:3000/tcp` to Host port `3000`
@@ -128,7 +128,7 @@ curl http://localhost:3000/health
 ```json
 {
   "environment": "production",
-  "service": "auth",
+  "service": "short-auth",
   "status": "ok"
 }
 ```
