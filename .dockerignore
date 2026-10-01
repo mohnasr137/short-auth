@@ -21,6 +21,7 @@ Dockerfile
 README.md
 auth.json
 benchmark/
+benchmarks/
 integrations/
 data/
 

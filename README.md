@@ -9,7 +9,7 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
 ## ✨ Features
 
 - **⚡ Blazing Fast**: JWT signature verification runs locally in CPU memory via OIDC JWKS (`< 0.5ms` latency, verified at **10,000+ RPS** with **0.00% errors**).
-- **📦 All-in-One Container**: Keycloak and the Go Auth Microservice are bundled into a single image (`short-auth:latest`).
+- **📦 All-in-One Container**: Keycloak and the Go Auth Microservice are bundled into a single image (`mohnasr137/short-auth:latest`).
 - **🗄️ Your Database, Zero Lock-In**: Connects directly to your existing database (PostgreSQL, MySQL, Supabase, Neon, AWS RDS). All tables live cleanly inside an isolated `keycloak` schema.
 - **🛡️ Bulletproof Persistence**: Zero Docker storage volumes (`docker compose down -v` will **never** wipe your users or passwords).
 - **🛡️ 64-Shard Striped Rate Limiting**: In-memory token-bucket rate limiter striped across 64 independent mutex shards to eliminate lock contention under extreme concurrency.
@@ -24,7 +24,7 @@ Designed for microservices architectures that need a **fast, trusted, and self-c
 
 ```
 ┌────────────────────────────────────────────────────────────────────────┐
-│                   short-auth:latest (Single Container)                 │
+│             mohnasr137/short-auth:latest (Single Container)            │
 │                                                                        │
 │   Client Traffic                                                       │
 │         │                                                              │
@@ -97,7 +97,7 @@ docker run -d \
   -e DB_USERNAME=postgres \
   -e DB_PASSWORD=your_secure_password \
   --add-host host.docker.internal:host-gateway \
-  short-auth:latest
+  mohnasr137/short-auth:latest
 ```
 
 ---
@@ -105,7 +105,7 @@ docker run -d \
 ### 🖥️ Option 4: Docker Desktop GUI
 
 If you are running the image via the **Docker Desktop application**:
-1. Go to **Images** ➔ Find **`short-auth:latest`** ➔ Click **Run**.
+1. Go to **Images** ➔ Find **`mohnasr137/short-auth:latest`** ➔ Click **Run**.
 2. Expand **Optional settings**:
    * **Ports**:
      * Map `:3000/tcp` to Host port `3000`
@@ -140,7 +140,7 @@ curl http://localhost:3000/health
 
 ## 🔌 Integration Examples ([`integrations/`](./integrations))
 
-Ready-to-use Docker Compose integration examples are provided in the [`integrations/`](./integrations) folder (see [integrations documentation](./integrations/README.md)). These show external developers how to run the published `short-auth:latest` image directly alongside a database and the **Adminer** web database manager (`http://localhost:8081`):
+Ready-to-use Docker Compose integration examples are provided in the [`integrations/`](./integrations) folder (see [integrations documentation](./integrations/README.md)). These show external developers how to run the published `mohnasr137/short-auth:latest` image directly alongside a database and the **Adminer** web database manager (`http://localhost:8081`):
 
 ### 🐘 PostgreSQL 18 Integration
 Runs an isolated PostgreSQL 18 stack with automatic `keycloak` schema setup:

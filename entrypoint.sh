@@ -41,7 +41,7 @@ if [ ${#MISSING_VARS[@]} -ne 0 ]; then
   echo "     -e DB_URL=jdbc:postgresql://host.docker.internal:5432/my_database \\"
   echo "     -e DB_USERNAME=your_username \\"
   echo "     -e DB_PASSWORD=your_password \\"
-  echo "     short-auth:latest"
+  echo "     mohnasr137/short-auth:latest"
   echo "================================================================================"
   exit 1
 fi

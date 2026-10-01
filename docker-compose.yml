@@ -1,6 +1,6 @@
 services:
   short-auth:
-    image: short-auth:latest
+    image: mohnasr137/short-auth:latest
     build:
       context: .
       dockerfile: Dockerfile
